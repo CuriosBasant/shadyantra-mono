@@ -1,0 +1,11 @@
+{
+  "name": "shadyantra",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "web:dev": "cd packages/web && yarn dev",
+    "core:w": "cd packages/core && yarn watch"
+  }
+}

@@ -1,0 +1,12 @@
+node_modules
+private
+*.lock
+.vscode
+.DS_Store
+lib
+.eslintcache
+*.local
+.next
+*.d.ts
+*.default.*
+_.*

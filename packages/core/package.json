@@ -1,0 +1,23 @@
+{
+  "name": "@shadyantra/core",
+  "version": "0.1.0",
+  "main": "lib/index.js",
+  "typings": "lib/typings/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "start": "node .",
+    "compile": "tsc",
+    "test": "ts-node src/test/game.ts",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@shadyantra/extends": "0.1.0",
+    "nanoid": "^3.1.20"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.22",
+    "@types/require-all": "^3.0.1",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3"
+  }
+}
