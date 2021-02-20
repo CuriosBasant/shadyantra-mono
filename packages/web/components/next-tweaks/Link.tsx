@@ -2,12 +2,13 @@ import NextLink from "next/link"
 
 type Props = {
   href: string
-  children: ChildNode
+  children: React.ReactNode
+  className?: string
 }
-export default function Link({ href, children }: Props) {
+export default function Link({ href, children, className }: Props) {
   return (
     <NextLink href={ href }>
-      <a>{ children }</a>
+      <a className={ className }>{ children }</a>
     </NextLink>
   )
 }
