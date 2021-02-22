@@ -7,7 +7,7 @@ type ProfileData = {
   photoURL?: string | null
 }
 type User = firebase.User & {
-  isAdmin: boolean
+  isAdmin?: boolean
 }
 interface IAuth {
   user: User | null
@@ -35,14 +35,14 @@ export function AuthProvider({ children }: Props) {
 
   useEffect(() => {
     return auth.onIdTokenChanged(async _user => {
-      let user: User = null
-      if (_user) {
-        const tokenResult = await _user.getIdTokenResult()
-        user = { ..._user, isAdmin: tokenResult.claims.admin }
-      }
+      // let user: User = null
+      // if (_user) {
+      //   const tokenResult = await _user.getIdTokenResult()
+      //   user = { ..._user, isAdmin: tokenResult.claims.admin }
+      // }
 
       setIsLoading(false)
-      setUser(user)
+      setUser(_user)
     })
   }, [])
 

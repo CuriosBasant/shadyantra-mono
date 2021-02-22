@@ -1,10 +1,10 @@
 {
   "name": "@shadyantra/web",
   "version": "0.1.0",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "export": "next export",
     "start": "next start"
   },
   "dependencies": {

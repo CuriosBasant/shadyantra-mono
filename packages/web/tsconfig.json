@@ -10,7 +10,6 @@
     ],
     "jsx": "preserve",
     "outDir": "dist",
-    "declarationDir": "dist/typings",
     "resolveJsonModule": true,
     "allowJs": true,
     "allowSyntheticDefaultImports": true,

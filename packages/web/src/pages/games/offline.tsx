@@ -7,8 +7,9 @@ import { BoardContainer, Page } from '../../components'
 
 export default function OfflineBoard() {
 
-  return <Page title='Offile Shadyantra'>
+  return (
     <BoardContainer />
-  </Page>
+    // <Page title='Offline Shadyantra'> </Page>
+  )
 }
 

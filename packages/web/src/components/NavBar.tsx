@@ -34,8 +34,7 @@ export default function NavBar() {
         </div>
         <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
           <div className="flex-shrink-0 flex items-center">
-            <img className="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
-            <img className="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow" />
+            <span className='text-white text-lg'>Shadyantra</span>
           </div>
           <div className="hidden sm:block sm:ml-6">
             <div className="flex space-x-4">
@@ -77,8 +76,7 @@ export default function NavBar() {
             <div className={ `${ isProfileMenuOpen ? '' : 'hidden' } z-10 origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5` } role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
               <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>
               <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
-              <button onClick={ signout } className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</button>
+              <button onClick={ () => signout() } className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 text-left w-full" role="menuitem">Sign out</button>
             </div>
           </div>
         </div>
