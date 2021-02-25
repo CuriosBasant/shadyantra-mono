@@ -1,5 +1,4 @@
 import { Arthshastri, Ashvarohi, Gajarohi, Guptchar, Maharathi, Piece, Pyada, Rajendra, Rajrishi, Senapati } from '.'
-import { Square } from '../board'
 import { Alliance } from '../player'
 
 const Type = {
