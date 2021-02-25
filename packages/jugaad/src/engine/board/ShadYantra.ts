@@ -154,7 +154,7 @@ export default class ShadYantra extends EventEmitter {
     let sqrIndex = 0
     for (const ch of fen) {
       if (ch == '/') continue
-      if (ch.isNumber()) {
+      if (+ch) {
         sqrIndex += +ch
       } else {
         builder.setPiece(PieceFactory.Create(ch as PieceNotation, sqrIndex))
