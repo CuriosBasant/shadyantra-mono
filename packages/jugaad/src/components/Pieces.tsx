@@ -31,9 +31,9 @@ export default function Pieces({ pieces }: any) {
   )
 }
 
-const Piece = React.memo(({ notation, name, square }: IPiece) => {
+const Piece = ({ notation, name, square }: IPiece) => {
   const X = FILES.indexOf(square[0]), Y = -square[1]
   return <span className='absolute duration-1000 flex w-full h-full font-mono transition-transform' style={ { transform: `translate(${ X }00%, ${ Y }00%)` } }>
     <span className="piece m-auto" title={ name }>{ PIECE_UNICODE_SYMBOL[notation] }</span>
   </span>
-}, () => true)
+}
