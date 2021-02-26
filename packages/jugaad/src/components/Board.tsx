@@ -26,7 +26,7 @@ function Square({ index, onSquareClick }) {
 }
 
 const boardStyles: CSSProperties = {
-  background: 'center / 20% url(../assets/board-background-checker.png) #ddd'
+  background: 'center / 20% url(../assets/board-background-checker.png) #0002'
 }
 type BoardProps = {
   onSquareClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void

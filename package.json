@@ -5,6 +5,7 @@
     "packages/*"
   ],
   "scripts": {
+    "jugaad": "cd packages/jugaad && yarn dev",
     "web:dev": "cd packages/web && yarn dev",
     "core:w": "cd packages/core && yarn watch"
   }

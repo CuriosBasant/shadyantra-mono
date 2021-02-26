@@ -1,8 +1,11 @@
 const plugin = require('tailwindcss/plugin');
+const colors = require('tailwindcss/colors');
+
 module.exports = {
   purge: ['./src/**/*.{jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    colors,
     extend: {
       width: {
         '1/10': '10%',
@@ -12,6 +15,7 @@ module.exports = {
       }
     }
   },
+  backgroundColor: (theme) => theme('colors'),
   variants: {
     extend: {
     },
@@ -37,8 +41,16 @@ module.exports = {
             zIndex: '50'
           }
         },
-        '.selected': {
-          backgroundColor: 'yellow !important'
+        '.trail': {
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#93C5FD',
+          }
         }
       });
     }),

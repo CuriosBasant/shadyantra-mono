@@ -1,8 +1,8 @@
 export const BOARD_SIZE = 10
 export const TOTAL_SQUARES = BOARD_SIZE ** 2
 
-export const _DEFAULT_FEN = '0c1ir1c0/cmhgasghmc/cppppppppc/9/9/9/9/CPPPPPPPPC/CMHGSAGHMC/0C1RI1C0'
-export const DEFAULT_FEN = '.c..ir..c.cmhgasghmccppppppppc........................................CPPPPPPPPCCMHGSAGHMC.C..RI..C.'
+export const _DEFAULT_FEN = '0c1ia1c0/cmhgrsghmc/cppppppppc/9/9/9/9/CPPPPPPPPC/CMHGSRGHMC/0C1AI1C0'
+export const DEFAULT_FEN = '.c..ia..c.cmhgrsghmccppppppppc........................................CPPPPPPPPCCMHGSRGHMC.C..AI..C.'
 export const ORTHOGONAL_DIRECTION = Object.freeze([BOARD_SIZE, 1, -1, -BOARD_SIZE])
 export const DIAGNAL_DIRECTION = Object.freeze([BOARD_SIZE - 1, BOARD_SIZE + 1, -BOARD_SIZE - 1, -BOARD_SIZE + 1])
 

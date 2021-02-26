@@ -1,7 +1,7 @@
-import { AttackMove, Board, Move, NormalMove, PromotionMove, SuicideMove, WeakMove } from '.';
-import { Piece } from '../pieces';
-import { Alliance } from '../player';
-import { ADJACENT_DIRECTION } from '../Utils';
+import { AttackMove, Board, Move, NormalMove, PromotionMove, SuicideMove, WeakMove } from '.'
+import { Piece } from '../pieces'
+import { Alliance } from '../player'
+import { ADJACENT_DIRECTION } from '../Utils'
 
 
 export enum SQUARE_FLAGS {
@@ -16,7 +16,7 @@ export enum SQUARE_FLAGS {
   x1, a1, b1, c1, d1, e1, f1, g1, h1, y1,
   x0, a0, b0, c0, d0, e0, f0, g0, h0, y0,
 };
-export type SquareName = keyof typeof SQUARE_FLAGS;
+export type SquareName = keyof typeof SQUARE_FLAGS
 
 export default abstract class Square {
   candidatePieces = new Set<Piece>();
@@ -30,121 +30,124 @@ export default abstract class Square {
 
   /** Returns the nearby square from this square*/
   getNearbySquare(relativeIndex: number) {
-    return this.board.getSquareAt(this.index + relativeIndex) || null;
+    return this.board.getSquareAt(this.index + relativeIndex) || null
   }
 
   /** Checks if other square is of same zone  */
   isZoneSame(square: Square | null) {
-    return this.constructor === square?.constructor;
+    return this.constructor === square?.constructor
   }
 
   /** Checks if other square is a neighbour  */
   isNearbySquare(square: Square) {
-    const differenceIndex = this.index - square.index;
-    return ADJACENT_DIRECTION.includes(differenceIndex);
+    const differenceIndex = this.index - square.index
+    return ADJACENT_DIRECTION.includes(differenceIndex)
   }
 
   /** Checks if any Opponent's Royal Member is on any Surrounding Squares */
   isOpponentRoyalNearby() {
     return ADJACENT_DIRECTION.some(index => {
-      const neighbourSquare = this.getNearbySquare(index)!; // fake !
+      const neighbourSquare = this.getNearbySquare(index)! // fake !
       return this.isZoneSame(neighbourSquare) &&    // returns false if NS is null
         neighbourSquare.piece.isRoyal &&
-        this.piece.isEnemyOf(neighbourSquare.piece);
-    });
+        this.piece.isEnemyOf(neighbourSquare.piece)
+    })
   }
   freeze() {
-    this.board.setSquare(new MediateZone(this.board, this.name, this.alliance));
+    this.board.setSquare(new MediateZone(this.board, this.name, this.alliance))
   }
 
   addDominantPiece(piece: Piece) {
-    this.#dominators.add(piece);
+    this.#dominators.add(piece)
   }
   restrictPieceToMove(piece: Piece) {
-    this.restrictedPieces.add(piece);
+    this.restrictedPieces.add(piece)
   }
 
   addAttacker(piece: Piece) {
-    this.#attackers.add(piece);
+    this.#attackers.add(piece)
   }
   isAttackedBy(piece: Piece) {
-    this.#attackers.has(piece);
+    this.#attackers.has(piece)
   }
 
   get isInAttack() {
-    return Boolean(this.#attackers.size);
+    return Boolean(this.#attackers.size)
   }
   get isMyCastle(): boolean {
-    return this.isCastle && this.isOfMine;
+    return this.isCastle && this.isOfMine
+  }
+  get isOpponentCastle(): boolean {
+    return this.isCastle && this.isOfOpponent
   }
 
   get index() {
-    return SQUARE_FLAGS[this.name];
+    return SQUARE_FLAGS[this.name]
   }
   get piece() {
-    return this.board.builder.config[this.index];
+    return this.board.builder.config[this.index]
   }
   get isOccupied() {
-    return !this.isEmpty;
+    return !this.isEmpty
   }
   get isEmpty() {
-    return this.piece.isNull;
+    return this.piece.isNull
   }
   get isOfMine() {
-    return this.alliance == this.board.activePlayer.alliance;
+    return this.alliance == this.board.activePlayer.alliance
   }
   get isOfOpponent() {
-    return !this.isOfMine;
+    return !this.isOfMine
   }
   get file() {
-    return this.name[0];
+    return this.name[0]
   }
   get rank() {
-    return +this.name[1];
+    return +this.name[1]
   }
 
   get forwardSquare() {
-    const dir = this.board.activePlayer.alliance.direction;
-    return this.getNearbySquare(dir as unknown as number);
+    const dir = this.board.activePlayer.alliance.direction
+    return this.getNearbySquare(dir as unknown as number)
   }
   get backwardSquare() {
-    const dir = this.board.activePlayer.alliance.direction;
-    return this.getNearbySquare(dir.backward);
+    const dir = this.board.activePlayer.alliance.direction
+    return this.getNearbySquare(dir.backward)
   }
   get leftSquare() {
-    const dir = this.board.activePlayer.alliance.direction;
-    return this.getNearbySquare(dir.left);
+    const dir = this.board.activePlayer.alliance.direction
+    return this.getNearbySquare(dir.left)
   }
   get rightSquare() {
-    const dir = this.board.activePlayer.alliance.direction;
-    return this.getNearbySquare(dir.right);
+    const dir = this.board.activePlayer.alliance.direction
+    return this.getNearbySquare(dir.right)
   }
 
   get isWarZone(): boolean {
-    return this instanceof WarZone;
+    return this instanceof WarZone
   }
   get isTruceZone(): boolean {
-    return this instanceof TruceZone;
+    return this instanceof TruceZone
   }
   get isMediateZone(): boolean {
-    return this instanceof MediateZone;
+    return this instanceof MediateZone
   }
   get isCastle(): boolean {
-    return this instanceof CastleZone;
+    return this instanceof CastleZone
   }
   get isForbiddenZone(): boolean {
-    return this instanceof ForbiddenZone;
+    return this instanceof ForbiddenZone
   }
 
   /** Returns boolean if to break the loop */
-  abstract createMove(moves: Move[], originSquare: Square): boolean;
+  abstract createMove(moves: Move[], originSquare: Square): boolean
   createWeakMove(moves: Move[], originSquare: Square) {
-    this.isEmpty && moves.push(new WeakMove(originSquare, this));
-    return this.isOccupied;
+    this.isEmpty && moves.push(new WeakMove(originSquare, this))
+    return this.isOccupied
   }
   createPromotionMove(moves: Move[], originSquare: Square) {
     if (this.isZoneSame(originSquare)) {
-      moves.push(new PromotionMove(originSquare, this));
+      moves.push(new PromotionMove(originSquare, this))
     }
   }
   createDemotionMove(moves: Move[], originSquare: Square) {
@@ -155,11 +158,11 @@ export default abstract class Square {
   }
   protected createDominatingMove(moves: Move[], originSquare: Square) {
     if (this.isEmpty) {
-      moves.push(new NormalMove(originSquare, this));
+      moves.push(new NormalMove(originSquare, this))
     } else if (originSquare.piece.isDominantOn(this)) {
-      moves.push(new AttackMove(originSquare, this));
+      moves.push(new AttackMove(originSquare, this))
     }
-    return this.isOccupied;
+    return this.isOccupied
   }
 }
 
@@ -167,63 +170,63 @@ export class WarZone extends Square {
   createMove(moves: Move[], originSquare: Square) {
     return originSquare.isTruceZone || originSquare.isMediateZone ?
       this.createWeakMove(moves, originSquare) || originSquare.isTruceZone :
-      this.createDominatingMove(moves, originSquare);
+      this.createDominatingMove(moves, originSquare)
   }
 }
 
 export class TruceZone extends Square {
   createMove(moves: Move[], originSquare: Square) {
-    return this.createWeakMove(moves, originSquare);
+    return this.createWeakMove(moves, originSquare)
   }
   createWeakMove(moves: Move[], originSquare: Square): true {
-    return originSquare.isTruceZone || super.createWeakMove(moves, originSquare) || true;
+    return originSquare.isTruceZone || super.createWeakMove(moves, originSquare) || true
   }
   getNearbySquare(relativeIndex: number) {
-    const neighbourSquare = this.board.getSquareAt(this.index + relativeIndex);
-    if (!neighbourSquare) return null;
+    const neighbourSquare = this.board.getSquareAt(this.index + relativeIndex)
+    if (!neighbourSquare) return null
     if (this.file == 'x') {
-      if (neighbourSquare.file == 'y') return null;
+      if (neighbourSquare.file == 'y') return null
     } else { // if file = 'y'
-      if (neighbourSquare.file == 'x') return null;
+      if (neighbourSquare.file == 'x') return null
     }
-    return neighbourSquare;
+    return neighbourSquare
   }
 }
 
 export class CastleZone extends Square {
   createMove(moves: Move[], originSquare: Square): true {
-    return originSquare.piece.isRoyal && this.createDominatingMove(moves, originSquare) || true;
+    return originSquare.piece.isRoyal && this.createDominatingMove(moves, originSquare) || true
   }
   createWeakMove(moves: Move[], originSquare: Square): true {
     if (originSquare.piece.isRoyal || originSquare.piece.isGodman && this.isMyCastle)
-      super.createWeakMove(moves, originSquare);
-    return true;
+      super.createWeakMove(moves, originSquare)
+    return true
   }
 }
 
 export class MediateZone extends Square {
   createMove(moves: Move[], originSquare: Square) {
     // If coming from MZ -> false; TZ -> true; OZ -> makes weak move
-    return !originSquare.isMediateZone && (this.createWeakMove(moves, originSquare) || originSquare.isTruceZone);
+    return !originSquare.isMediateZone && (this.createWeakMove(moves, originSquare) || originSquare.isTruceZone)
     // return originSquare.isMediateZone ? false : this.createWeakMove(moves, originSquare) || originSquare.isTruceZone;
   }
 }
 
 export class ForbiddenZone extends Square {
   createMove(moves: Move[], originSquare: Square) {
-    return this.createWeakMove(moves, originSquare);
-    const Mover = originSquare.piece.isGodman ? NormalMove : SuicideMove;
-    moves.push(new Mover(originSquare, this));
-    return true;
+    return this.createWeakMove(moves, originSquare)
+    const Mover = originSquare.piece.isGodman ? NormalMove : SuicideMove
+    moves.push(new Mover(originSquare, this))
+    return true
   }
   // createWeakMove(moves: Move[], originSquare: Square) {
   //   return this.createMove(moves, originSquare);
   // }
   getNearbySquare(relativeIndex: number) {
-    const neighbourSquare = this.board.getSquareAt(this.index + relativeIndex);
+    const neighbourSquare = this.board.getSquareAt(this.index + relativeIndex)
     return (
       !neighbourSquare || neighbourSquare.isForbiddenZone ||
       neighbourSquare.isTruceZone && this.file != neighbourSquare.file
-    ) ? null : neighbourSquare;
+    ) ? null : neighbourSquare
   }
 }

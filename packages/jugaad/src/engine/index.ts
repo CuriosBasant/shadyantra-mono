@@ -1,6 +1,6 @@
 // import { EventEmitter } from 'events'
 import { nanoid } from "nanoid"
-import { Board, Builder, SquareName, SQUARE_FLAGS } from './board'
+import { Board, Builder, Move, NormalMove, SquareName, SQUARE_FLAGS } from './board'
 import ShadYantra from './board/ShadYantra'
 import { PieceFactory } from './pieces'
 import { Alliance } from './player'
@@ -64,7 +64,7 @@ export default class Shatranjan {
       current: this._board.getSquareWithName(f)!,
       destination: this._board.getSquareWithName(t)!,
     }
-    if (!square.current || !square.destination || square.current == square.destination)
+    if (!square.current || !square.destination)
       throw new Error("Invalid Square Provided!")
     if (square.current.isEmpty)
       throw new Error("The Origin Square is Empty.")
@@ -74,10 +74,13 @@ export default class Shatranjan {
     const { current, destination } = this.parseMove(moveStr)
     const selectedPieceMoves = this._board.activePlayer.moves.get(current)
     if (!selectedPieceMoves) throw new Error("It's not your turn!")
-
-    const move = selectedPieceMoves.find(move => move.destinationSquare == destination)
-    if (!move) {
-      return console.error('Invalid move')
+    let move: Move
+    if (isForced) {
+      if (current == destination) throw new Error("Can't force move on same square")
+      move = new NormalMove(current, destination)
+    } else {
+      move = selectedPieceMoves.find(move => move.destinationSquare == destination)
+      if (!move) throw new Error('Invalid move')
     }
     this._board = move.execute()
   }
