@@ -16,7 +16,7 @@ export default abstract class OfficerPiece extends Piece {
   }
   controlNearbySoldiers(board: Board) {
     const currentSquare = this.square(board)
-    if (currentSquare.isMediateZone) return
+    if (!(currentSquare.isWarZone || currentSquare.isTruceZone)) return
 
     for (const relativeIndex of ADJACENT_DIRECTION) {
       const neighbourSquare = currentSquare.getNearbySquare(relativeIndex)! // fake !
@@ -26,11 +26,8 @@ export default abstract class OfficerPiece extends Piece {
       }
     }
   }
-  isDominantOn(destinationSquare: Square) {
-    return destinationSquare.isWarZone && super.isDominantOn(destinationSquare)
-  }
 
-  protected straightMovement(moves: Move[], currentSquare: Square, direction: number, toRetreat = false): Square {
+  protected slidingMovement(moves: Move[], currentSquare: Square, direction: number, toRetreat = false): Square {
     const loop = (refSquare: Square): Square => {
       const nextSquare = refSquare.getNearbySquare(direction)
       if (!nextSquare || toRetreat && nextSquare.isOfOpponent) return refSquare
@@ -63,13 +60,13 @@ export class Maharathi extends OfficerPiece {
 
   maybeRetreatedPath(moves: Move[], currentSquare: Square, toRetreat: boolean) {
     const { left, forward, right } = this.alliance.direction
-    this.straightMovement(moves, currentSquare, left, toRetreat)
-    this.straightMovement(moves, currentSquare, right, toRetreat)
-    this.straightMovement(moves, currentSquare, forward, toRetreat)
+    this.slidingMovement(moves, currentSquare, left, toRetreat)
+    this.slidingMovement(moves, currentSquare, right, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward, toRetreat)
   }
   unRetreatedPath(moves: Move[], currentSquare: Square) {
     const { backward } = this.alliance.direction
-    this.straightMovement(moves, currentSquare, backward)
+    this.slidingMovement(moves, currentSquare, backward)
   }
   moveTo(move: Move) {
     return new Maharathi(move.destinationSquare.index, move.movedPiece.alliance)
@@ -83,13 +80,13 @@ export class Gajarohi extends OfficerPiece {
 
   maybeRetreatedPath(moves: Move[], currentSquare: Square, toRetreat: boolean) {
     const { left, forward, right } = this.alliance.direction
-    this.straightMovement(moves, currentSquare, forward + left, toRetreat)
-    this.straightMovement(moves, currentSquare, forward + right, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward + left, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward + right, toRetreat)
   }
   unRetreatedPath(moves: Move[], currentSquare: Square) {
     const { left, backward, right } = this.alliance.direction
-    this.straightMovement(moves, currentSquare, backward + left)
-    this.straightMovement(moves, currentSquare, backward + right)
+    this.slidingMovement(moves, currentSquare, backward + left)
+    this.slidingMovement(moves, currentSquare, backward + right)
   }
   moveTo(move: Move) {
     return new Gajarohi(move.destinationSquare.index, move.movedPiece.alliance)
@@ -124,17 +121,17 @@ export class Senapati extends KnightLike {
     this.trishoolMovement(moves, currentSquare, left, toRetreat)
     this.trishoolMovement(moves, currentSquare, forward, toRetreat)
     this.trishoolMovement(moves, currentSquare, right, toRetreat)
-    this.straightMovement(moves, currentSquare, left, toRetreat)
-    this.straightMovement(moves, currentSquare, forward + left, toRetreat)
-    this.straightMovement(moves, currentSquare, forward, toRetreat)
-    this.straightMovement(moves, currentSquare, forward + right, toRetreat)
-    this.straightMovement(moves, currentSquare, right, toRetreat)
+    this.slidingMovement(moves, currentSquare, left, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward + left, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward, toRetreat)
+    this.slidingMovement(moves, currentSquare, forward + right, toRetreat)
+    this.slidingMovement(moves, currentSquare, right, toRetreat)
   }
   unRetreatedPath(moves: Move[], currentSquare: Square) {
     const { left, backward, right } = this.alliance.direction
-    this.straightMovement(moves, currentSquare, backward + left)
-    this.straightMovement(moves, currentSquare, backward)
-    this.straightMovement(moves, currentSquare, backward + right)
+    this.slidingMovement(moves, currentSquare, backward + left)
+    this.slidingMovement(moves, currentSquare, backward)
+    this.slidingMovement(moves, currentSquare, backward + right)
     this.trishoolMovement(moves, currentSquare, backward)
   }
   protected isWeak(resourceSquare: Square) {

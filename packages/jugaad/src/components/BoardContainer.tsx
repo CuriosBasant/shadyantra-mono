@@ -1,24 +1,18 @@
 import { Component, createRef, CSSProperties } from 'react'
 import { Board, Pieces } from '.'
-import Shatranjan from '../engine'
+import Shatranjan, { IPiece } from '../engine'
 
 const containerStyles: CSSProperties = {
   width: '100vmin',
   height: '100vmin',
 }, TRAIL_PATH_CLASS = 'bg-lightBlue-200'
-type IPiece = {
-  // position: number
-  notation: string
-  name: string
-  square: string
-  side: 'w' | 'b'
-}
+
 type Props = {
   game: Shatranjan
 }
 type IBoardState = {
   selectedSquare: string | null
-  squares: (IPiece | null)[]
+  pieces: Record<string, IPiece>
   validMoves: Record<string, string[]>
 }
 
@@ -26,7 +20,7 @@ abstract class GameContainer extends Component<Props, IBoardState> {
   protected abstract makeMove(from: string, to: string, isForced?: boolean): void
   state: IBoardState = {
     selectedSquare: null,
-    squares: this.game.board.squares as (IPiece | null)[],
+    pieces: this.game.board.pieces,
     validMoves: this.game.board.validMoves
   }
   // static getDerivedStateFromProps(props, state) {
@@ -69,7 +63,7 @@ abstract class GameContainer extends Component<Props, IBoardState> {
     const squareName = ev.currentTarget.dataset.squareName
     if (!squareName) throw new Error("Invalid SquareName")
 
-    const { selectedSquare, squares, validMoves } = this.state
+    const { selectedSquare, pieces, validMoves } = this.state
     // const sqrObj = squares.find(sqr => sqr?.square == squareName)
     // if (!sqrObj) return console.log("No square found")
 
@@ -90,11 +84,18 @@ abstract class GameContainer extends Component<Props, IBoardState> {
     }
   }
   render() {
-    return <div id='board-container' className='relative' style={ containerStyles }>
-      <div className='absolute ml-1 flex flex-col justify-around h-full' style={ { fontSize: '2vmin' } }>{ '9876543210'.split('').map(ch => <span key={ ch } className='h-full'>{ ch }</span>) }</div>
-      <div className='absolute bottom-0 flex justify-around w-full' style={ { fontSize: '2vmin' } }>{ 'xabcdefghy'.split('').map(ch => <span key={ ch } className='text-right mr-1 w-full'>{ ch }</span>) }</div>
-      <Pieces pieces={ this.state.squares } />
-      <Board ref={ this.boardRef } onSquareClick={ this.onSquareClick } />
+    return <div className="flex flex-col lg:flex-row">
+      <div id='board-container' className='relative' style={ containerStyles }>
+        <div className='absolute ml-1 flex flex-col justify-around h-full' style={ { fontSize: '2vmin' } }>{ '9876543210'.split('').map(ch => <span key={ ch } className='h-full'>{ ch }</span>) }</div>
+        <div className='absolute bottom-0 flex justify-around w-full' style={ { fontSize: '2vmin' } }>{ 'xabcdefghy'.split('').map(ch => <span key={ ch } className='text-right mr-1 w-full'>{ ch }</span>) }</div>
+        <Pieces pieces={ Object.values(this.state.pieces) } />
+        <Board ref={ this.boardRef } pieces={ this.state.pieces } onSquareClick={ this.onSquareClick } />
+      </div>
+      <div className='flex-1'>
+        <label className='select-none'>
+          <input type="checkbox" /> Enable Automatic Switch Turn
+      </label>
+      </div>
     </div>
   }
 }
@@ -113,7 +114,7 @@ class OfflineGame extends GameContainer {
       console.error(error.message)
     }
     const aa = this.game.board
-    this.setState({ validMoves: aa.validMoves, squares: aa.squares })
+    this.setState({ validMoves: aa.validMoves, pieces: aa.pieces })
   }
 }
 

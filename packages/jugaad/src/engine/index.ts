@@ -16,10 +16,11 @@ type MoveObject = {
   from: string | number,
   to: string | number
 }
-type IPiece = {
+export type IPiece = {
   // position: number
   notation: string
   name: string
+  nickname: string
   square: string
   side: 'w' | 'b'
 }
@@ -121,8 +122,14 @@ export default class Shatranjan {
     return ''
   }
   get board() {
-    const squares = this._board.squares.map(({ name }) => this.getPiece(name))
-    return { squares, validMoves: this.getMoves() }
+    const pieces: Record<string, IPiece> = {}
+    this._board.squares.forEach(({ name }) => {
+      const piece = this.getPiece(name)
+      if (piece) {
+        pieces[name] = piece
+      }
+    })
+    return { pieces, validMoves: this.getMoves() }
   }
   getPiece(squareName: string): IPiece | null {
     const square = this._board.squareMap.get(squareName as 'x0')
@@ -131,6 +138,7 @@ export default class Shatranjan {
     return piece.isNull ? null : {
       square: squareName,
       name: piece.type.name,
+      nickname: piece.type.nickname,
       notation: piece.notation,
       side: piece.alliance.symbol
     }

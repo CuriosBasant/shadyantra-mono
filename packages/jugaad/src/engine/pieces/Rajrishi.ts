@@ -34,8 +34,6 @@ export default class Rajrishi extends Piece {
     this.loopSurrounding(board, (square: Square) => square.freeze())
   }
   controlOpponentOfficers(board: Board) {
-    const currentSquare = this.square(board)
-    if (currentSquare.isCastle || currentSquare.isForbiddenZone) return
     this.loopSurrounding(board, (square: Square) => {
       if (this.isEnemyOf(square.piece) && square.piece.isOfficer)
         this.adjacentOpponentOfficers.add(square.piece)
@@ -44,7 +42,7 @@ export default class Rajrishi extends Piece {
   }
   private loopSurrounding(board: Board, fun: (square: Square) => void) {
     const currentSquare = this.square(board)
-    if (currentSquare.isOpponentRoyalNearby()) return
+    if (currentSquare.isCastle || currentSquare.isForbiddenZone || currentSquare.isOpponentRoyalNearby()) return
 
     for (const relativeIndex of ADJACENT_DIRECTION) {
       const neighbourSquare = currentSquare.getNearbySquare(relativeIndex)! // fake !

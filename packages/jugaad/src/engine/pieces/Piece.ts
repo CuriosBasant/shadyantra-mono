@@ -4,20 +4,20 @@ import { Alliance } from '../player'
 import { BOARD_SIZE } from '../Utils'
 
 export class PieceType {
-  constructor(readonly symbol: PieceSymbol, readonly name: string, readonly value: number, readonly MAX_PARITY: number) { }
+  constructor(readonly symbol: PieceSymbol, readonly name: string, readonly nickname: string, readonly value: number, readonly MAX_PARITY: number) { }
 }
 
 export default abstract class Piece {
-  static readonly RAJENDRA = new PieceType('I', 'rajendra', 9, 1);
-  static readonly RAJENDRAW = new PieceType('J', 'rajendra', 9, 1);
-  static readonly ARTHSHASTRI = new PieceType('A', 'arthshastri', 8, 1);
-  static readonly RAJRISHI = new PieceType('R', 'rajrishi', 7, 1);
-  static readonly SENAPATI = new PieceType('S', 'senapati', 6, 1);
-  static readonly MAHARATHI = new PieceType('M', 'maharathi', 5, 2);
-  static readonly ASHVAROHI = new PieceType('H', 'ashvarohi', 4, 2);
-  static readonly GAJAROHI = new PieceType('G', 'gajarohi', 3, 2);
-  static readonly GUPTCHAR = new PieceType('C', 'guptchar', 2, 6);
-  static readonly PYADA = new PieceType('P', 'pyada', 1, 8);
+  static readonly RAJENDRA = new PieceType('I', 'rajendra', 'Indra', 9, 1);
+  static readonly RAJENDRAW = new PieceType('J', 'rajendra', 'Indra', 9, 1);
+  static readonly ARTHSHASTRI = new PieceType('A', 'arthshastri', 'Shastri', 8, 1);
+  static readonly RAJRISHI = new PieceType('R', 'rajrishi', 'Rishi', 7, 1);
+  static readonly SENAPATI = new PieceType('S', 'senapati', 'Senapati', 6, 1);
+  static readonly MAHARATHI = new PieceType('M', 'maharathi', 'Ratha', 5, 2);
+  static readonly ASHVAROHI = new PieceType('H', 'ashvarohi', 'Ashva', 4, 2);
+  static readonly GAJAROHI = new PieceType('G', 'gajarohi', 'Gaja', 3, 2);
+  static readonly GUPTCHAR = new PieceType('C', 'guptchar', 'Charan', 2, 6);
+  static readonly PYADA = new PieceType('P', 'pyada', 'Pyada', 1, 8);
   static readonly NULL_PIECE = null as unknown as NullPiece;
 
   static readonly STRENGTH_ORDER = Object.freeze([
@@ -36,7 +36,15 @@ export default abstract class Piece {
   }
 
   square(board: Board) {
+
     return board.getSquareAt(this.position)!
+  }
+  getInsignia(sign: -1 | 1) {
+    const insignia = Piece.STRENGTH_ORDER[this.type.value + sign - 2]
+    if (!insignia) {
+      throw new Error(`${ this.type.name } is not ${ sign < 1 ? 'de' : 'pro' }motable `)
+    }
+    return insignia
   }
 
   private mote(sign: -1 | 1) {
@@ -45,7 +53,8 @@ export default abstract class Piece {
     if (!nextRank) {
       throw new Error(`Cannot ${ sign < 1 ? 'de' : 'pro' }mote ${ this.type.name }`)
     }
-    return PieceFactory.Create(this.notation, this.position)
+    const notation = this.alliance == Alliance.WHITE ? nextRank.symbol : nextRank.symbol.toLowerCase()
+    return PieceFactory.Create(notation, this.position)
   }
   /** Promotes the piece  */
   promote() {
@@ -56,7 +65,10 @@ export default abstract class Piece {
     return this.mote(-1)
   }
   couldBePromoted() {
-
+    return true
+  }
+  couldBeDemoted() {
+    return true
   }
   isDominantOn(destinationSquare: Square) {
     return this.isEnemyOf(destinationSquare.piece) && !destinationSquare.piece.isGodman

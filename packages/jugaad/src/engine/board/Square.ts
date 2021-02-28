@@ -2,6 +2,7 @@ import { AttackMove, Board, Move, NormalMove, PromotionMove, SuicideMove, WeakMo
 import { Piece } from '../pieces'
 import { Alliance } from '../player'
 import { ADJACENT_DIRECTION } from '../Utils'
+import { DemotionMove } from './Movement'
 
 
 export enum SQUARE_FLAGS {
@@ -151,7 +152,7 @@ export default abstract class Square {
     }
   }
   createDemotionMove(moves: Move[], originSquare: Square) {
-
+    moves.push(new DemotionMove(originSquare, this))
   }
   createControlMove(moves: Move[], originSquare: Square) {
 
@@ -179,7 +180,10 @@ export class TruceZone extends Square {
     return this.createWeakMove(moves, originSquare)
   }
   createWeakMove(moves: Move[], originSquare: Square): true {
-    return originSquare.isTruceZone || super.createWeakMove(moves, originSquare) || true
+    if (originSquare.isTruceZone || this.isOccupied) return true
+
+    return (originSquare.piece.isOfficer && !originSquare.isRoyalNearby ?
+      this.createDemotionMove(moves, originSquare) : super.createWeakMove(moves, originSquare)) || true
   }
   getNearbySquare(relativeIndex: number) {
     const neighbourSquare = this.board.getSquareAt(this.index + relativeIndex)
