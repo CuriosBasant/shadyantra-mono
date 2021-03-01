@@ -12,6 +12,7 @@ type Props = {
 }
 type IBoardState = {
   fillWhite: boolean
+  sounds: null | Record<string, HTMLAudioElement>
   selectedSquare: string | null
   pieces: Record<string, IPiece>
   validMoves: Record<string, string[]>
@@ -21,6 +22,7 @@ abstract class GameContainer extends Component<Props, IBoardState> {
   protected abstract makeMove(from: string, to: string, isForced?: boolean): void
   state: IBoardState = {
     fillWhite: true,
+    sounds: null,
     selectedSquare: null,
     pieces: this.game.board.pieces,
     validMoves: this.game.board.validMoves
@@ -36,6 +38,7 @@ abstract class GameContainer extends Component<Props, IBoardState> {
   private isMyTurn = false;
 
   componentDidMount() {
+    this.setState({ sounds: { 'make-move': new Audio('./assets/sounds/make-move.wav') } })
     // @ts-ignore
     const squareElements = Array.from<HTMLButtonElement>(this.boardRef.current!.children)
     for (const squareElement of squareElements) {
@@ -106,9 +109,8 @@ abstract class GameContainer extends Component<Props, IBoardState> {
 }
 
 class OfflineGame extends GameContainer {
-  static sound = new Audio('./assets/sounds/make-move.wav')
   protected makeMove(from: string, to: string, isForced = false) {
-    OfflineGame.sound.play()
+    this.state.sounds['make-move'].play()
     console.log(`Making Move ${ from }-${ to }`)
     this.lastMove?.split('-').forEach(s => {
       this.squareRefs.get(s)!.classList.remove('trail')
