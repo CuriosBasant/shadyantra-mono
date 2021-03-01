@@ -11,6 +11,7 @@ type Props = {
   game: Shatranjan
 }
 type IBoardState = {
+  fillWhite: boolean
   selectedSquare: string | null
   pieces: Record<string, IPiece>
   validMoves: Record<string, string[]>
@@ -19,6 +20,7 @@ type IBoardState = {
 abstract class GameContainer extends Component<Props, IBoardState> {
   protected abstract makeMove(from: string, to: string, isForced?: boolean): void
   state: IBoardState = {
+    fillWhite: true,
     selectedSquare: null,
     pieces: this.game.board.pieces,
     validMoves: this.game.board.validMoves
@@ -88,20 +90,25 @@ abstract class GameContainer extends Component<Props, IBoardState> {
       <div id='board-container' className='relative' style={ containerStyles }>
         <div className='absolute ml-1 flex flex-col justify-around h-full' style={ { fontSize: '2vmin' } }>{ '9876543210'.split('').map(ch => <span key={ ch } className='h-full'>{ ch }</span>) }</div>
         <div className='absolute bottom-0 flex justify-around w-full' style={ { fontSize: '2vmin' } }>{ 'xabcdefghy'.split('').map(ch => <span key={ ch } className='text-right mr-1 w-full'>{ ch }</span>) }</div>
-        <Pieces pieces={ Object.values(this.state.pieces) } />
+        <Pieces pieces={ Object.values(this.state.pieces) } isStroke={ this.state.fillWhite } />
         <Board ref={ this.boardRef } pieces={ this.state.pieces } onSquareClick={ this.onSquareClick } />
       </div>
       <div className='flex-1'>
-        <label className='select-none'>
+        <label className='select-none block'>
           <input type="checkbox" /> Enable Automatic Switch Turn
-      </label>
+        </label>
+        <label className='select-none block'>
+          <input type="checkbox" onChange={ ev => this.setState(state => ({ fillWhite: !state.fillWhite })) } checked={ this.state.fillWhite } /> Fill White Pieces
+        </label>
       </div>
     </div>
   }
 }
 
 class OfflineGame extends GameContainer {
+  static sound = new Audio('./assets/sounds/make-move.wav')
   protected makeMove(from: string, to: string, isForced = false) {
+    OfflineGame.sound.play()
     console.log(`Making Move ${ from }-${ to }`)
     this.lastMove?.split('-').forEach(s => {
       this.squareRefs.get(s)!.classList.remove('trail')
