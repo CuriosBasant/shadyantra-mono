@@ -1,15 +1,22 @@
-import Axios from 'axios'
-// import { useCallback, useRef, useState } from 'react'
-import { Page, AuthenticationForm, Link } from '../components'
-import { useAuth } from '../providers'
-Axios.defaults.baseURL = process.env.BACKEND_URL
+import { useEffect } from "react"
+import { Board } from "../components/shadyantra"
+import { useBoard, BoardProvider, BoardActionTypes } from "../providers/BoardProvider"
 
+function Container() {
+  const { state, dispatch } = useBoard()
+  const onSquareClick = (index: number) => {
+    console.log(index)
+  }
+  useEffect(() => {
+    dispatch({ type: BoardActionTypes.Empty })
+  }, [])
+  return <Board squares={state.squares} onSquareClick={onSquareClick} />
+}
 
-export default function Home() {
-  const { user } = useAuth()
-  if (!user) return <AuthenticationForm />
-
-  return <Page title='Dashboard'>
-    <Link href='/games/offline' className='font-medium text-indigo-600 hover:text-indigo-500'>Play Offline</Link>
-  </Page>
+export default function Root() {
+  return (
+    <BoardProvider>
+      <Container />
+    </BoardProvider>
+  )
 }
