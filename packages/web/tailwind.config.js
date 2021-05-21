@@ -1,46 +1,33 @@
-const plugin = require('tailwindcss/plugin');
 module.exports = {
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  mode: "jit",
+  purge: ["./src/**/*.tsx"],
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
       width: {
-        '1/10': '10%',
+        "1/10": "10%",
+      },
+      maxWidth: {
+        "8xl": "90rem",
       },
       height: {
-        '1/10': '10%',
-      }
-    }
+        "1/10": "10%",
+      },
+    },
   },
   variants: {
     extend: {
+      cursor: ["hover", "focus"],
     },
   },
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true
-  },
+  // future: {
+  //   removeDeprecatedGapUtilities: true,
+  //   purgeLayersByDefault: true,
+  // },
   plugins: [
-    plugin(function ({ addUtilities, addComponents, e, prefix, config }) {
-      // Add your custom styles here
-      addUtilities({
-        '.path': {
-          '&::after': {
-            content: "''",
-            top: '50%',
-            left: '50%',
-            position: 'absolute',
-            padding: '2vmin',
-            borderRadius: '50%',
-            backgroundColor: '#0014',
-            transform: 'translate(-50%, -50%)',
-            zIndex: '50'
-          }
-        },
-        '.selected': {
-          backgroundColor: 'yellow !important'
-        }
-      });
-    }),
+    // require("@tailwindcss/typography"),
+    require("@tailwindcss/forms"),
+    // require("@tailwindcss/line-clamp"),
+    require("@tailwindcss/aspect-ratio"),
   ],
-};
+}

@@ -9,21 +9,21 @@
       "DOM.Iterable"
     ],
     "jsx": "preserve",
-    "outDir": "dist",
+    // "outDir": "dist",
     "resolveJsonModule": true,
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
     "noEmit": true,
-    "alwaysStrict": false,
-    "strict": false,
-    // "incremental": true
+    "alwaysStrict": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "incremental": true,
+    "allowJs": true
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx"
+    "src/**/*.{ts, tsx}"
   ],
   "exclude": [
     "node_modules",

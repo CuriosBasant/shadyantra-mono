@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+  .path {
+    position: relative;
+  }
+  .path::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 0.75rem;
+    border-radius: 50%;
+    background-color: #0006;
+    pointer-events: none;
+    z-index: 5;
+  }
+}

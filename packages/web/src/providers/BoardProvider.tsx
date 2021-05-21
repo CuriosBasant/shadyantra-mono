@@ -1,77 +1,146 @@
-// @ts-nocheck
-import React, { createContext, ReactChild, ReactChildren, useContext, useMemo, useRef } from 'react'
-import Axios from 'axios'
-import { useImmerReducer } from 'use-immer'
-import Shatranjan from "@shadyantra/core"
+import React, { createContext, useContext } from "react"
+import { useImmerReducer } from "use-immer"
 
-enum BOARD_EVENTS { LOAD_GAME = 'LOAD_GAME', NEW_GAME = 'NEW_GAME', MAKE_MOVE = 'MAKE_MOVE' };
-// const BOARD_EVENTS = { LOAD_GAME: 0, NEW_GAME: 1 };
-type IPiece = {
-  position: number
-  notation: string
-  name: string
-  squareName: string
-  side: 'WHITE' | 'BLACK'
+/* -----------x Reducer x----------- */
+export enum BoardActions {
+  MovePiece = "MOVE_PIECE",
+  Click = "SQUARE_CLICK",
+  Empty = "EMPTY_BOARD",
+  PutPiece = "PUT_PIECE",
+  MarkMove = "MARK_MOVE",
+  Clear = "BOARD_CLEAR",
+  Reset = "BOARD_RESET",
+  LoadFen = "LOAD_FEN",
 }
-type IBoardStatus = {
-  gameId: string
-  squares: {
-    name: string
-    piece: IPiece | null
-  }[]
-  validMoves: Record<string, string[]>
+
+function loadFen(squares: SquareData[], fen: string) {
+  let index = 0
+  for (const row of fen.split("/")) {
+    for (const ch of row) {
+      if (isNaN(+ch)) {
+        const upper = ch.toUpperCase()
+        squares[index].piece = (upper + (ch == upper ? "W" : "B")) as ""
+        index++
+      } else {
+        const upto = +ch || 10
+        for (let i = 0; i < upto; i++) {
+          squares[index].piece = ""
+          index++
+        }
+      }
+    }
+  }
 }
-type IBoardAction = {
-  type: BOARD_EVENTS
-  payload?: any
+
+type BoardActionEvent = {
+  type: BoardActions
+  payload?: Record<string, any>
+}
+function Reducer(draft: IBoard, action: BoardActionEvent) {
+  switch (action.type) {
+    case BoardActions.MovePiece:
+      draft.squares[action.payload!.to].piece = draft.squares[action.payload!.from].piece
+      draft.squares[action.payload!.from].piece = ""
+      break
+    case BoardActions.PutPiece:
+      draft.squares[action.payload!.index].piece = action.payload!.piece
+      break
+    case BoardActions.MarkMove:
+      draft.squares[action.payload!.index].moves = action.payload!.mark
+      break
+    case BoardActions.Clear:
+      if (action.payload.clear == "all") {
+        for (const square of draft.squares) {
+          square.piece = ""
+          square.moves = ""
+        }
+      } else {
+        for (const square of draft.squares) {
+          square[action.payload.clear] = ""
+        }
+      }
+      break
+    case BoardActions.Reset: {
+      const defaultFen = "1c2ia2c1/cmhgrsghmc/cppppppppc/0/0/0/0/CPPPPPPPPC/CMHGSRGHMC/1C2AI2C1"
+      loadFen(draft.squares, defaultFen)
+      draft.fen = defaultFen
+      return draft
+    }
+    case BoardActions.LoadFen:
+      loadFen(draft.squares, action.payload.fen)
+      draft.fen = action.payload.fen
+      return draft
+    case BoardActions.Empty:
+      draft.squares = init().squares
+      break
+
+    default:
+      return draft
+  }
+  let lastCharAt = -1
+  draft.fen = draft.squares
+    .reduce((str, { piece }, i) => {
+      if (piece) {
+        str +=
+          (i - lastCharAt == 1 ? "" : i - lastCharAt - 1) +
+          (piece[1] == "W" ? piece[0] : piece[0].toLowerCase())
+        lastCharAt = i
+      }
+      if (i % 10 == 9) {
+        str += (i - lastCharAt == 10 ? "0" : i - lastCharAt || "") + "/"
+        lastCharAt = i
+      }
+      return str
+    }, "")
+    .slice(0, -1)
+  return draft
+}
+
+/* --------------------------------- */
+type PieceSymbols = "P" | "G" | "H" | "M" | "S" | "C" | "R" | "A" | "I"
+export type SquareData = {
+  index: number
+  piece: "" | `${PieceSymbols}${"W" | "B"}`
+  type: 0 | 1 | 2 | 3
+  // type: "forbidden" | "castle" | "battlefield" | "truce"
+  moves?: any
 }
 type IBoard = {
-  State: IBoardStatus
-  Dispatcher: BoardDispatch//React.Dispatch<IBoardAction>;
-}
-type Props = {
-  children: ReactChild | ReactChildren
+  squares: SquareData[]
   fen: string
-  gameId: string
 }
 
-export const BoardContext = createContext({} as IBoard)
+const INITIAL_STATE: IBoard = {
+  squares: [],
+  fen: "",
+}
 
-export class BoardDispatch {
-  constructor(readonly Dispatch: React.Dispatch<IBoardAction>) {
-  }
-  static Actions = new Map<BOARD_EVENTS, (draft: IBoardStatus, payload: any) => void>()
-    // .set(BOARD_EVENTS.LOAD_GAME, (draft, payload) => draft.status = payload)
-    // .set(BOARD_EVENTS.NEW_GAME, (draft, payload) => draft.gameId = payload)
-    .set(BOARD_EVENTS.MAKE_MOVE, (draft, payload) => {
-      draft.squares = payload.squares
-      draft.validMoves = payload.validMoves
-    })
-    ;
-  static Reducer(draft: IBoardStatus, action: IBoardAction) {
-    const actionToExecute = BoardDispatch.Actions.get(action.type)
-    actionToExecute && actionToExecute(draft, action.payload)
-  }
-  newGame(payload: any) {
-    this.Dispatch({ type: BOARD_EVENTS.NEW_GAME, payload })
-  }
-  loadGame(payload: any) {
-    // console.log('from load', BOARD_EVENTS.LOAD_GAME);
-    this.Dispatch({ type: BOARD_EVENTS.LOAD_GAME, payload })
-  }
-  async makeMove(gameId, obj) {
-    const data = await Axios.post(`http://localhost:3000/api/games/${ gameId }`, { data: obj })
-    this.Dispatch({ type: BOARD_EVENTS.MAKE_MOVE, payload: data.data })
-    console.log(data.data, obj)
+type Props = {
+  children: React.ReactNode
+}
+export const BoardContext = createContext({
+  state: INITIAL_STATE,
+  dispatch: (() => null) as React.Dispatch<BoardActionEvent>,
+})
+function init(): IBoard {
+  return {
+    fen: "9/".repeat(10).slice(0, -1),
+    squares: Array.from<number, SquareData>(Array(100), (_, i) => {
+      const row = ((i / 10) | 0) % 9,
+        col = (i % 10) % 9
+      return {
+        index: i,
+        piece: "",
+        // type: row ? (col ? "battlefield" : "truce") : col ? "castle" : "forbidden",
+        type: parseInt(`${+!!row}${+!!col}`, 2) as 0,
+      }
+    }),
   }
 }
-export function BoardProvider({ fen, gameId, children }: Props) {
-  const game = Shatranjan.Create(gameId, fen)
-  const [State, Dispatch] = useImmerReducer<IBoardStatus, IBoardAction>(BoardDispatch.Reducer, status)
-  const value = useMemo(() => ({ State, Dispatcher: new BoardDispatch(Dispatch) }), [State])
-  return (
-    <BoardContext.Provider value={ value }>{ children }</BoardContext.Provider>
-  )
+export function BoardProvider({ children }: Props) {
+  const [state, dispatch] = useImmerReducer(Reducer, INITIAL_STATE, init)
+  // const value = {}
+  return <BoardContext.Provider value={{ state, dispatch }}>{children}</BoardContext.Provider>
 }
 export function useBoard() {
   return useContext(BoardContext)

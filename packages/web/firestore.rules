@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  	function isAdmin() {
+    	return request.auth.token.admin;
+    }
+    function isLoggedIn() {
+    	return request.auth.uid != null
+    }
+    function isOwned(userId) {
+    	return request.auth.uid == userId
+    }
+    
+  	match /users/{userId} {
+    	allow create: if isLoggedIn();
+      allow read, write: if isOwned(userId);
+      allow delete: if isAdmin();
+    }
+    match /{document=**} {
+    //  allow read, write: if
+    //      request.time < timestamp.date(2021, 2, 28);
+    
+    	allow read, write: if true; //isLoggedIn();
+    }
+  }
+}
