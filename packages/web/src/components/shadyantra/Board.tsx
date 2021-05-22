@@ -56,7 +56,7 @@ export function Board({ squares, onSquareClick, flip = false }: BoardProp) {
           flip ? "flex-row-reverse" : "flex-row"
         } w-full mx-0.5 text-[.5rem] font-mono  text-gray-600 md:text-xs bottom-0`}
       >
-        {"abcdefghij".split("").map((ch) => (
+        {"xabcdefghy".split("").map((ch) => (
           <b key={ch} className="flex-1 pr-1 text-right">
             {ch}
           </b>

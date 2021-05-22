@@ -16,14 +16,19 @@ export enum BoardActions {
 function loadFen(squares: SquareData[], fen: string) {
   let index = 0
   for (const row of fen.split("/")) {
+    let r = 0
     for (const ch of row) {
+      // r += NaN or 0 || NaN || 1
+      const maybeNum = +ch || +ch + 10 || 1
+      r += maybeNum
+      if (r > 10) throw new RangeError("Row exceeded!")
+
       if (isNaN(+ch)) {
         const upper = ch.toUpperCase()
         squares[index].piece = (upper + (ch == upper ? "W" : "B")) as ""
         index++
       } else {
-        const upto = +ch || 10
-        for (let i = 0; i < upto; i++) {
+        for (let i = 0; i < maybeNum; i++) {
           squares[index].piece = ""
           index++
         }
@@ -39,8 +44,10 @@ type BoardActionEvent = {
 function Reducer(draft: IBoard, action: BoardActionEvent) {
   switch (action.type) {
     case BoardActions.MovePiece:
-      draft.squares[action.payload!.to].piece = draft.squares[action.payload!.from].piece
-      draft.squares[action.payload!.from].piece = ""
+      if (draft.squares[action.payload!.from].piece) {
+        draft.squares[action.payload!.to].piece = draft.squares[action.payload!.from].piece
+        draft.squares[action.payload!.from].piece = ""
+      }
       break
     case BoardActions.PutPiece:
       draft.squares[action.payload!.index].piece = action.payload!.piece
@@ -67,7 +74,11 @@ function Reducer(draft: IBoard, action: BoardActionEvent) {
       return draft
     }
     case BoardActions.LoadFen:
-      loadFen(draft.squares, action.payload.fen)
+      try {
+        loadFen(draft.squares, action.payload.fen)
+      } catch (error) {
+        console.error(error)
+      }
       draft.fen = action.payload.fen
       return draft
     case BoardActions.Empty:
@@ -124,7 +135,7 @@ export const BoardContext = createContext({
 })
 function init(): IBoard {
   return {
-    fen: "9/".repeat(10).slice(0, -1),
+    fen: "0/".repeat(10).slice(0, -1),
     squares: Array.from<number, SquareData>(Array(100), (_, i) => {
       const row = ((i / 10) | 0) % 9,
         col = (i % 10) % 9
