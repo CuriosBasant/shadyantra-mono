@@ -4,6 +4,17 @@ import { Board } from "../../components/shadyantra"
 import { database } from "../../firebase"
 import { BoardActions, BoardContext, BoardProvider } from "../../providers/BoardProvider"
 
+const pieceName = {
+  I: "Indra",
+  A: "Shastri",
+  C: "Charan",
+  R: "Rishi",
+  S: "Senapati",
+  M: "Ratha",
+  G: "Gaja",
+  H: "Ashwa",
+  P: "Pyada",
+}
 type SpareProp = {
   setSelectedPiece: (piece: string) => void
   color: "W" | "B"
@@ -18,6 +29,7 @@ function Spare({ color, selectedPiece, setSelectedPiece }: SpareProp) {
         return (
           <button
             key={symbol}
+            title={pieceName[ch]}
             className={` relative flex-1 transition-colors rounded focus:outline-none p-1 ${
               selectedPiece == symbol ? "bg-blue-300" : "hover:bg-gray-400"
             }`}
@@ -103,7 +115,7 @@ export class BoardEditor extends Component<{ isOffline: boolean }, StateType> {
     this.editorDoc.set({ action: BoardActions.Reset })
   }
   flip = () => {
-    // this.setState({ isFlipped: data.value })
+    this.setState((prev) => ({ isFlipped: !prev.isFlipped }))
   }
   clearBoard(all: string) {
     this.editorDoc.set({ action: BoardActions.Clear, clear: all })
@@ -117,7 +129,7 @@ export class BoardEditor extends Component<{ isOffline: boolean }, StateType> {
       { state } = this.context
     return (
       <div className="flex flex-col md:flex-row">
-        <div className="flex-1 h-screen p-4 space-y-4 lg:p-0">
+        <div className="flex-1 h-screen p-2 space-y-4 lg:p-0">
           <div className="grid gap-2" style={{ gridTemplateColumns: "1fr 10fr" }}>
             <div className=""></div>
             <Spare color="B" selectedPiece={pieceToPut} setSelectedPiece={this.selectPiece} />
@@ -136,6 +148,7 @@ export class BoardEditor extends Component<{ isOffline: boolean }, StateType> {
                 ))}
                 <div className="flex-1"></div>
                 <button
+                  title="Delete a Piece"
                   className={`h-1/10 ${
                     !pieceToPut ? "bg-red-200" : "hover:bg-red-200"
                   } focus:outline-none rounded `}
