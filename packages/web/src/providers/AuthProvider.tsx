@@ -1,7 +1,14 @@
-import React, { createContext, useContext, useEffect, Component, useState, ReactChild, useMemo } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  Component,
+  useState,
+  ReactChild,
+  useMemo,
+} from "react"
 import type firebase from "firebase"
 import { auth } from "../firebase"
-import { credential } from 'firebase-admin'
 type ProfileData = {
   displayName?: string | null
   photoURL?: string | null
@@ -34,7 +41,7 @@ export function AuthProvider({ children }: Props) {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    return auth.onIdTokenChanged(async _user => {
+    return auth.onIdTokenChanged(async (_user) => {
       // let user: User = null
       // if (_user) {
       //   const tokenResult = await _user.getIdTokenResult()
@@ -46,18 +53,21 @@ export function AuthProvider({ children }: Props) {
     })
   }, [])
 
-  const value: IAuth = useMemo(() => ({
-    user,
-    signup: (email: string, password: string) => auth.createUserWithEmailAndPassword(email, password).then(credential => credential.user),
-    signin: (email: string, password: string) => auth.signInWithEmailAndPassword(email, password).then(credential => credential.user),
-    signout: () => auth.signOut(),
-    updateEmail: (email: string) => user!.updateEmail(email),
-    updateProfile: (data: ProfileData) => user!.updateProfile(data),
-    resetPassword: (email: string) => auth.sendPasswordResetEmail(email),
-    updatePassword: (password: string) => user!.updatePassword(password),
-    // updateNumber: number=> user!.updatePhoneNumber(number)
-  }), [user])
-  return <AuthContext.Provider value={ value }>
-    { !isLoading && children }
-  </AuthContext.Provider>
+  const value: IAuth = useMemo(
+    () => ({
+      user,
+      signup: (email: string, password: string) =>
+        auth.createUserWithEmailAndPassword(email, password).then((credential) => credential.user),
+      signin: (email: string, password: string) =>
+        auth.signInWithEmailAndPassword(email, password).then((credential) => credential.user),
+      signout: () => auth.signOut(),
+      updateEmail: (email: string) => user!.updateEmail(email),
+      updateProfile: (data: ProfileData) => user!.updateProfile(data),
+      resetPassword: (email: string) => auth.sendPasswordResetEmail(email),
+      updatePassword: (password: string) => user!.updatePassword(password),
+      // updateNumber: number=> user!.updatePhoneNumber(number)
+    }),
+    [user]
+  )
+  return <AuthContext.Provider value={value}>{!isLoading && children}</AuthContext.Provider>
 }
