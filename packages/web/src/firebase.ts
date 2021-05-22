@@ -31,7 +31,7 @@ export const Timestamp = firebase.firestore.Timestamp
 
 try {
   // @ts-ignore
-  if (1 || window.location.hostname == "localhost") {
+  if (window.location.hostname == "localhost") {
     console.info("localhost detected!")
     // functions.useEmulator("localhost", 5001)
     firestore.settings({

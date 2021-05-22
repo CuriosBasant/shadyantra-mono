@@ -2,12 +2,7 @@
   "extends": "./../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "lib": [
-      "ES2019",
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2019", "ESNext", "DOM", "DOM.Iterable"],
     "jsx": "preserve",
     // "outDir": "dist",
     "resolveJsonModule": true,
@@ -18,15 +13,8 @@
     "alwaysStrict": true,
     "strict": true,
     "strictNullChecks": true,
-    "incremental": true,
     "allowJs": true
   },
-  "include": [
-    "next-env.d.ts",
-    "src/**/*.{ts, tsx}"
-  ],
-  "exclude": [
-    "node_modules",
-    "out"
-  ]
+  "include": ["next-env.d.ts", "src/**/*.{ts, tsx}"],
+  "exclude": ["node_modules", "out"]
 }
